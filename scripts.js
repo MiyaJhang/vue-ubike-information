@@ -1,12 +1,15 @@
 const vm = Vue.createApp({
     data () {
       return {
-        ubikeStops: []
+        uBikeStops: [],
+        searchValue: '',
+        isSortState: false,
+        currentSort: ''
       }
     },
     methods: {
       timeFormat(t){
-
+        // 時間格式
         var date = [], time = [];
 
         date.push(t.substr(0, 4));
@@ -17,6 +20,28 @@ const vm = Vue.createApp({
         time.push(t.substr(12, 2));
 
         return date.join("/") + ' ' + time.join(":");
+      },
+      setSort (val) {
+        // 切換排序狀態
+        if (val === this.currentSort) {
+          this.isSortState = !this.isSortState;
+        } else {
+          this.currentSort = val;
+          this.isSortState = false;
+        }
+      }
+    },
+    computed: {
+      filterUbikeStops () {
+        // 場站名稱搜尋
+        return this.uBikeStops.filter(d => d.sna.includes(this.searchValue));
+      },
+      sortUbikeStops () {
+        // 搜尋結果做排序功能
+        const newUbikeStops = [...this.filterUbikeStops];
+        return this.isSortState 
+          ? newUbikeStops.sort((a, b) => a[this.currentSort] - b[this.currentSort])
+          : newUbikeStops.sort((a, b) => b[this.currentSort] - a[this.currentSort]);
       }
     },
     created() {
@@ -32,8 +57,8 @@ const vm = Vue.createApp({
         fetch('https://tcgbusfs.blob.core.windows.net/blobyoubike/YouBikeTP.gz')
           .then(res => res.json())
           .then(res => {
-              // 將 json 轉陣列後存入 this.ubikeStops
-              this.ubikeStops = Object.keys(res.retVal).map(key => res.retVal[key]);
+              // 將 json 轉陣列後存入 this.uBikeStops
+              this.uBikeStops = Object.keys(res.retVal).map(key => res.retVal[key]);
           });
 
     }
