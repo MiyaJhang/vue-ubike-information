@@ -29,11 +29,32 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>#</th>
+          <th @click="setSort('sno')">
+            #
+            <span v-show="currentSort === '' || currentSort != 'sno'">
+              <i 
+                class="fa fa-sort"
+                aria-hidden="true"
+              ></i>
+            </span>
+            <span v-show="currentSort === 'sno'">
+              <i 
+                class="fa"
+                :class="isSortState ? 'fa-sort-asc' : 'fa-sort-desc'"
+                aria-hidden="true"
+              ></i>
+            </span>
+          </th>
           <th>場站名稱</th>
           <th>場站區域</th>
           <th @click="setSort('sbi')">
             目前可用車輛
+            <span v-show="currentSort === '' || currentSort != 'sbi'">
+              <i 
+                class="fa fa-sort"
+                aria-hidden="true"
+              ></i>
+            </span>
             <span v-show="currentSort === 'sbi'">
               <i 
                 class="fa"
@@ -44,6 +65,12 @@
           </th>
           <th @click="setSort('tot')">
             總停車格
+            <span v-show="currentSort === '' || currentSort != 'tot'">
+              <i 
+                class="fa fa-sort"
+                aria-hidden="true"
+              ></i>
+            </span>
             <span v-show="currentSort === 'tot'">
               <i 
                 class="fa"
@@ -56,7 +83,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="s of sortUbikeStops">
+        <tr v-for="s of sliceUbikeStops">
           <td>{{ s.sno }}</td>
           <td>{{ s.sna }}</td>
           <td>{{ s.sarea }}</td>
@@ -67,9 +94,57 @@
       </tbody>
     </table>
     <!-- 頁籤 -->
-    <nav>
-      <ul>
-        <li></li>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        <!-- Previous -->
+        <!-- .prevent可防止瀏覽器預設行為, 如果沒有加點擊分頁會重繪並置頂 -->
+        <li 
+          class="page-item"
+          @click.prevent="setPage(currentPage - 1)"
+        >
+          <a class="page-link" href="#" aria-label="Previous">
+            <i class="fa fa-angle-left" aria-hidden="true"></i>
+          </a>
+        </li>
+        <!-- 到第一頁 -->
+        <li 
+          class="page-item"
+          v-show="pageTopStatus"
+          @click.prevent="setPage(1)"
+        >
+          <a class="page-link" href="#" aria-label="PageTop">
+            第一頁
+          </a>
+        </li>
+        <!-- Content -->
+        <li 
+          class="page-item"
+          v-for="i in pagerEnd"
+          :class="{ active: i + pagerAddAmount === currentPage }"
+          :key="i"
+          @click.prevent="setPage(i + pagerAddAmount)"
+        >
+          <a class="page-link" href="#">{{ i + pagerAddAmount }}</a>
+        </li>
+        <!-- 到最後頁 -->
+        <li 
+          class="page-item"
+          @click.prevent="setPageEnd()"
+        >
+          <a class="page-link" href="#" aria-label="PageEnd">
+            最後頁
+          </a>
+        </li>
+        <!-- Next -->
+        <li 
+          class="page-item"
+          v-show="pageEndStatus"
+          @click.prevent="setPage(currentPage + 1)"
+        >
+          <a class="page-link" href="#" aria-label="Next">
+            <i class="fa fa-angle-right" aria-hidden="true"></i>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>

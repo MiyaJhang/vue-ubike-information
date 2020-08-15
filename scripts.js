@@ -1,10 +1,22 @@
+// 單頁顯示筆數
+const COUNT_OF_PAGE = 10;
+// 頁碼最大數量
+const PAGINATION_MAX = 5;
+
 const vm = Vue.createApp({
     data () {
       return {
         uBikeStops: [],
         searchValue: '',
         isSortState: false,
-        currentSort: ''
+        currentSort: '',
+        currentPage: 1
+      }
+    },
+    watch: {
+      sortUbikeStops() {
+        // 當搜尋條件、排序變更時，強制切到第一頁
+        this.setPage(1);
       }
     },
     methods: {
@@ -20,15 +32,31 @@ const vm = Vue.createApp({
         time.push(t.substr(12, 2));
 
         return date.join("/") + ' ' + time.join(":");
+
+        // 備註: 老師時間格式的另一個作法
+        // const pattern = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
+        // return val.replace(pattern, "$1/$2/$3 $4:$5:$6");
       },
-      setSort (val) {
+      setSort (sort) {
         // 切換排序狀態
-        if (val === this.currentSort) {
+        if (sort === this.currentSort) {
           this.isSortState = !this.isSortState;
         } else {
-          this.currentSort = val;
+          this.currentSort = sort;
           this.isSortState = false;
         }
+      },
+      setPage (page) {
+        // 設定目前頁數
+        if (page < 1 || page > this.totalPageCount) {
+          return;
+        }
+        this.currentPage = page;
+      },
+      setPageEnd () {
+        // 如何使用 methods 內的其他 function?
+        const end = Math.round(this.sortUbikeStops.length / COUNT_OF_PAGE);
+        this.setPage(end);
       }
     },
     computed: {
@@ -42,6 +70,49 @@ const vm = Vue.createApp({
         return this.isSortState 
           ? newUbikeStops.sort((a, b) => a[this.currentSort] - b[this.currentSort])
           : newUbikeStops.sort((a, b) => b[this.currentSort] - a[this.currentSort]);
+      },
+      sliceUbikeStops () {
+        // 將排序的結果做分頁切割
+        const start = (this.currentPage - 1) * COUNT_OF_PAGE;
+        const end = start + COUNT_OF_PAGE <= this.sortUbikeStops.length
+          ? start + COUNT_OF_PAGE
+          : this.sortUbikeStops.length;
+
+        return this.sortUbikeStops.slice(start, end);
+      },
+      totalPageCount () {
+        // 計算總頁數
+        return Math.ceil(this.filterUbikeStops.length / COUNT_OF_PAGE);
+      },
+      pagerEnd () {
+        // 頁碼尾端
+        return this.totalPageCount <= PAGINATION_MAX
+          ? this.totalPageCount
+          : PAGINATION_MAX;
+      },
+      pagerAddAmount () {
+        // 頁碼位移
+        // 增加Math.round(PAGINATION_MAX / 2) - 1, 調整頁碼最大數量時, 也能使用。
+        const tmp =
+          this.totalPageCount <= PAGINATION_MAX
+            ? 0
+            : this.currentPage + Math.round(PAGINATION_MAX / 2) - 1 - this.pagerEnd;
+  
+        return tmp <= 0
+          ? 0
+          : this.totalPageCount - (PAGINATION_MAX + tmp) < 0
+          ? this.totalPageCount - PAGINATION_MAX
+          : tmp;
+      },
+      pageTopStatus () {
+        return this.currentPage > Math.round(PAGINATION_MAX / 2)
+          ? true
+          : false
+      },
+      pageEndStatus () {
+        return this.currentPage < Math.round(this.sortUbikeStops.length / COUNT_OF_PAGE) -1
+          ? true
+          : false
       }
     },
     created() {
@@ -60,6 +131,5 @@ const vm = Vue.createApp({
               // 將 json 轉陣列後存入 this.uBikeStops
               this.uBikeStops = Object.keys(res.retVal).map(key => res.retVal[key]);
           });
-
     }
 }).mount('#app');
