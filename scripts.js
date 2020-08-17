@@ -1,7 +1,8 @@
 // 單頁顯示筆數
 const COUNT_OF_PAGE = 10;
+
 // 頁碼最大數量
-const PAGINATION_MAX = 5;
+const PAGINATION_MAX = 10;
 
 const vm = Vue.createApp({
     data () {
@@ -53,8 +54,14 @@ const vm = Vue.createApp({
         }
         this.currentPage = page;
       },
+      setPageTop (status) {
+        const top = 1;
+        if (!status) {
+          return;
+        }
+        this.setPage(top);
+      },
       setPageEnd () {
-        // 如何使用 methods 內的其他 function?
         const end = Math.round(this.sortUbikeStops.length / COUNT_OF_PAGE);
         this.setPage(end);
       }
@@ -62,10 +69,13 @@ const vm = Vue.createApp({
     computed: {
       filterUbikeStops () {
         // 場站名稱搜尋
-        return this.uBikeStops.filter(d => d.sna.includes(this.searchValue));
+        return this.uBikeStops.length === 0
+          ? []
+          : this.uBikeStops.filter(d => d.sna.includes(this.searchValue));
       },
       sortUbikeStops () {
         // 搜尋結果做排序功能
+        // 新的陣列需要 return 若是原有的不一定要return
         const newUbikeStops = [...this.filterUbikeStops];
         return this.isSortState 
           ? newUbikeStops.sort((a, b) => a[this.currentSort] - b[this.currentSort])
@@ -105,12 +115,12 @@ const vm = Vue.createApp({
           : tmp;
       },
       pageTopStatus () {
-        return this.currentPage > Math.round(PAGINATION_MAX / 2)
+        return this.currentPage > Math.round(PAGINATION_MAX / 2) - 2
           ? true
           : false
       },
       pageEndStatus () {
-        return this.currentPage < Math.round(this.sortUbikeStops.length / COUNT_OF_PAGE) -1
+        return this.currentPage < Math.round(this.sortUbikeStops.length / COUNT_OF_PAGE) - PAGINATION_MAX
           ? true
           : false
       }

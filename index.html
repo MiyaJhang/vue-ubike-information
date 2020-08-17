@@ -109,8 +109,8 @@
         <!-- 到第一頁 -->
         <li 
           class="page-item"
-          v-show="pageTopStatus"
-          @click.prevent="setPage(1)"
+          :class="{ 'disabled': !pageTopStatus }"
+          @click.prevent="setPageTop(pageTopStatus)"
         >
           <a class="page-link" href="#" aria-label="PageTop">
             第一頁
@@ -129,6 +129,7 @@
         <!-- 到最後頁 -->
         <li 
           class="page-item"
+          :disable="pageEndStatus"
           @click.prevent="setPageEnd()"
         >
           <a class="page-link" href="#" aria-label="PageEnd">
@@ -138,7 +139,6 @@
         <!-- Next -->
         <li 
           class="page-item"
-          v-show="pageEndStatus"
           @click.prevent="setPage(currentPage + 1)"
         >
           <a class="page-link" href="#" aria-label="Next">
