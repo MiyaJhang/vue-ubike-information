@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="text-center">
     <nav class="relative z-0 inline-flex shadow-sm">
       <!-- Previous -->
       <!-- .prevent可防止瀏覽器預設行為, 如果沒有加點擊分頁會重繪並置頂 -->
@@ -62,7 +62,6 @@
 <script>
 // 單頁顯示筆數
 const COUNT_OF_PAGE = 10;
-
 // 頁碼最大數量
 const PAGINATION_MAX = 10;
 
@@ -121,6 +120,7 @@ export default {
   components: {
     // 用來定義子元件
   }
+  
 }
 </script>
 

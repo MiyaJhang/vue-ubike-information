@@ -28,7 +28,6 @@ export default {
   data () {
     return {
       // 要綁定的資料
-      selfSearchText: this.searchText
     }
   },
   props: {
@@ -40,12 +39,17 @@ export default {
   },
   watch: {
     // 用來觀察 vue 實體內資料的變動
-    selfSearchText (val) {
-      this.$emit("update:searchText", val);
-    }
   },
   computed: {
     // 自動為內部資料計算過的屬性
+    selfSearchText: {
+      get () {
+        return this.searchText;
+      },
+      set (value) {
+        this.$emit("update:searchText", value);
+      }
+    }
   },
   teplate: "",
   components: {

@@ -12,7 +12,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="hover:bg-teal-100" v-for="u in uBikeStopsData" :key="u.sno">
+        <tr class="hover:bg-teal-100" v-for="u in uBikeStops" :key="u.sno">
           <td class="border px-4 py-2">{{ u.sno }}</td>
           <td class="border px-4 py-2">{{ u.sna }}</td>
           <td class="border px-4 py-2">{{ u.sarea }}</td>
@@ -35,7 +35,7 @@ export default {
   },
   props: {
     // 用來接收外部資料的屬性
-    uBikeStopsData: Array
+    uBikeStops: Array
   },
   methods: {
     // 用來定義在 vue 實體內使用的函數
