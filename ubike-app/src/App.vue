@@ -1,10 +1,8 @@
 <template>
   <div id="app" class="w-full max-w-screen-xl mx-auto">
-    <Search 
-      :uBikeStopsData="uBikeStops" 
-      @update="searchUpdate"/>
-    <UbikeTable :uBikeStopsData="newUbikeStops"/>
-    <Pagination :uBikeStopsData="newUbikeStops"/>
+    <Search v-model:searchText="searchText"/>
+    <UbikeTable :uBikeStopsData="uBikeStops"/>
+    <Pagination :uBikeStopsData="uBikeStops"/>
   </div>
 </template>
 
@@ -17,7 +15,7 @@ export default {
   data () {
     return {
       uBikeStops: [],
-      newUbikeStops: []
+      searchText: ''
     }
   },
   components: {
@@ -25,13 +23,11 @@ export default {
     UbikeTable,
     Pagination
   },
+  methods: {
+    // 用來定義在 vue 實體內使用的函數
+  },
   watch: {
     // 用來觀察 vue 實體內資料的變動
-  },
-  methods: {
-    searchUpdate (val) {
-      this.newUbikeStops = [...val];
-    }
   },
   computed: {
     // 自動為內部資料計算過的屬性
