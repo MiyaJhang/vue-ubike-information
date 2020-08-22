@@ -7,7 +7,7 @@
         class="page-link" 
         href="" 
         aria-label="Previous"
-        @click.prevent="setPage(currentPage - 1)"
+        @click.prevent="setPage(selfCurrentPage - 1)"
       >
         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -19,7 +19,7 @@
         href="" 
         v-for="i in pagerEnd" 
         :key="i" 
-        :class="{ 'page-active': i + pagerAddAmount === currentPage }" 
+        :class="{ 'page-active': i + pagerAddAmount === selfCurrentPage }" 
         @click.prevent="setPage(i + pagerAddAmount)"
       >
         {{ i + pagerAddAmount }}
@@ -29,7 +29,7 @@
         class="page-link" 
         href="" 
         aria-label="Next"
-        @click.prevent="setPage(currentPage + 1)"
+        @click.prevent="setPage(selfCurrentPage + 1)"
       >
         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import bus from './bus';
+import bus from './bus'
 
 // 單頁顯示筆數
 const COUNT_OF_PAGE = 10;
@@ -52,13 +52,13 @@ export default {
     return {
       // 要綁定的資料
       bus,
-      currentPage: 1
+      selfCurrentPage: this.currentPage
     }
   },
   props: {
     // 用來接收外部資料的屬性
     uBikeStops: Array,
-    uBikeStopsSorted: Array
+    currentPage: Number
   },
   methods: {
     // 用來定義在 vue 實體內使用的函數
@@ -67,7 +67,8 @@ export default {
       if (page < 1 || page > this.totalPageCount) {
         return;
       }
-      this.currentPage = page;
+      this.selfCurrentPage = page;
+      bus.emit('change-page', this.selfCurrentPage);
     },
   },
   watch: {
@@ -75,16 +76,6 @@ export default {
   },
   computed: {
     // 自動為內部資料計算過的屬性
-    slicedUbikeStops () {
-      // 將排序的結果做分頁切割
-      const start = (this.currentPage - 1) * COUNT_OF_PAGE;
-      const end =
-        start + COUNT_OF_PAGE <= this.sortedUbikeStops.length
-          ? start + COUNT_OF_PAGE
-          : this.sortedUbikeStops.length;
-
-      return this.sortedUbikeStops.slice(start, end);
-    },
     totalPageCount () {
       // 計算總頁數
       return Math.ceil(this.uBikeStops.length / COUNT_OF_PAGE);
@@ -100,7 +91,7 @@ export default {
       const tmp =
         this.totalPageCount <= PAGINATION_MAX
           ? 0
-          : this.currentPage + 4 - this.pagerEnd;
+          : this.selfCurrentPage + 4 - this.pagerEnd;
 
       return tmp <= 0
         ? 0
@@ -112,16 +103,7 @@ export default {
   teplate: "",
   components: {
     // 用來定義子元件
-  },
-  created() {
-    bus.on('', this.totalPageCount);
-  },
-  beforeUnmount () {
-    // 銷毀 減少記憶體 要養成良好的習慣
-    // 注意使用名稱 重複
-    bus.off('', this.totalPageCount);
   }
-  
 }
 </script>
 

@@ -48,7 +48,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="hover:bg-teal-100" v-for="s in sortedUbikeStops" :key="s.sno">
+        <tr class="hover:bg-teal-100" v-for="s in slicedUbikeStops" :key="s.sno">
           <td class="border px-4 py-2">{{ s.sno }}</td>
           <td class="border px-4 py-2">{{ s.sna }}</td>
           <td class="border px-4 py-2">{{ s.sarea }}</td>
@@ -62,6 +62,9 @@
 </template>
 
 <script>
+// 單頁顯示筆數
+const COUNT_OF_PAGE = 10;
+
 export default {
   data() {
     return {
@@ -72,7 +75,8 @@ export default {
   },
   props: {
     // 用來接收外部資料的屬性
-    uBikeStops: Array
+    uBikeStops: Array,
+    currentPage: Number
   },
   methods: {
     // 用來定義在 vue 實體內使用的函數
@@ -89,7 +93,7 @@ export default {
         this.currentSort = sortType;
         this.isSortDesc = false;
       }
-      // this.$emit('update-ubikestops', this.sortedUbikeStops);
+      this.$emit('update-ubikestops', this.sortedUbikeStops);
     }
   },
   watch: {
@@ -104,6 +108,16 @@ export default {
       return this.isSortDesc
         ? filtedStops.sort((a, b) => a[this.currentSort] - b[this.currentSort])
         : filtedStops.sort((a, b) => b[this.currentSort] - a[this.currentSort]);
+    },
+    slicedUbikeStops () {
+      // 將排序的結果做分頁切割
+      const start = (this.currentPage - 1) * COUNT_OF_PAGE;
+      const end =
+        start + COUNT_OF_PAGE <= this.sortedUbikeStops.length
+          ? start + COUNT_OF_PAGE
+          : this.sortedUbikeStops.length;
+
+      return this.sortedUbikeStops.slice(start, end);
     },
   },
   teplate: "",
